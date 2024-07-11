@@ -10,17 +10,12 @@ import java.lang.reflect.Proxy;
 
 /**
  * @author Gemaxis
- * @date 2024/07/10 11:10
+ * @date 2024/07/10 17:21
  **/
-
-// 动态代理封装request对象
 @AllArgsConstructor
-public class ClientProxy implements InvocationHandler {
-    // 反射封装成request
-    private String host;
-    private int port;
+public class RPCClientProxy implements InvocationHandler {
+    private RPCClient client;
 
-    // jdk 动态代理，反射获取 request，socket 发送到服务端
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RPCRequest request = RPCRequest.builder()
@@ -28,7 +23,7 @@ public class ClientProxy implements InvocationHandler {
                 .methodName(method.getName())
                 .params(args).paramsType(method.getParameterTypes())
                 .build();
-        RPCResponse response = IOClient.sendRequest(host, port, request);
+        RPCResponse response = client.sendRequest( request);
         return response.getData();
     }
 

@@ -1,5 +1,6 @@
-package com.custom.client;
+package com.custom.test;
 
+import com.custom.client.ClientProxy;
 import com.custom.common.pojo.Blog;
 import com.custom.common.pojo.User;
 import com.custom.common.service.BlogService;

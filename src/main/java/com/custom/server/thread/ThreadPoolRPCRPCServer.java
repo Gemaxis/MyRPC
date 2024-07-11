@@ -40,7 +40,7 @@ public class ThreadPoolRPCRPCServer implements RpcServer {
 
     @Override
     public void start(int port) {
-        System.out.println("服务器启动了!!!");
+        System.out.println("线程池服务器启动了!!!");
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             while (true) {

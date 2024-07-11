@@ -1,7 +1,7 @@
 package com.custom.server.thread;
 
-import com.custom.common.message.RpcRequest;
-import com.custom.common.message.RpcResponse;
+import com.custom.common.message.RPCRequest;
+import com.custom.common.message.RPCResponse;
 import com.custom.server.ServiceProvider;
 import lombok.AllArgsConstructor;
 
@@ -11,7 +11,6 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
-import java.util.Map;
 
 /**
  * @author Gemaxis
@@ -31,9 +30,9 @@ public class WorkThread implements Runnable {
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             // 读取客户端的 request
-            RpcRequest rpcRequest = (RpcRequest) ois.readObject();
+            RPCRequest rpcRequest = (RPCRequest) ois.readObject();
             // 反射调用服务方法返回值
-            RpcResponse rpcResponse = getResponse(rpcRequest);
+            RPCResponse rpcResponse = getResponse(rpcRequest);
             oos.writeObject(rpcResponse);
             oos.flush();
         } catch (IOException | ClassNotFoundException e) {
@@ -41,7 +40,7 @@ public class WorkThread implements Runnable {
         }
     }
 
-    private RpcResponse getResponse(RpcRequest rpcRequest) {
+    private RPCResponse getResponse(RPCRequest rpcRequest) {
         // 得到服务名
         String interfaceName = rpcRequest.getInterfaceName();
         // 得到相应服务实现类
@@ -51,11 +50,11 @@ public class WorkThread implements Runnable {
         try {
             Method method = service.getClass().getMethod(rpcRequest.getMethodName(), rpcRequest.getParamsType());
             Object invoke = method.invoke(service, rpcRequest.getParams());
-            return RpcResponse.success(invoke);
+            return RPCResponse.success(invoke);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
             System.out.println("方法执行错误");
-            return RpcResponse.fail();
+            return RPCResponse.fail();
         }
     }
 }

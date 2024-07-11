@@ -11,7 +11,7 @@ import java.io.Serializable;
  **/
 @Data
 @Builder
-public class RpcRequest implements Serializable {
+public class RPCRequest implements Serializable {
     // 服务类名
     private String interfaceName;
     // 方法名
