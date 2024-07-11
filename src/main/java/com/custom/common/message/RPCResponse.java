@@ -1,5 +1,6 @@
 package com.custom.common.message;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,13 +12,16 @@ import java.io.Serializable;
  **/
 @Data
 @Builder
+@AllArgsConstructor
 public class RPCResponse implements Serializable {
     private int code;
     private String message;
     private Object data;
+    // 用其它序列化方式（除了java Serialize）得不到data的type
+    private Class<?> dataType;
 
     public static RPCResponse success(Object _data) {
-        return RPCResponse.builder().code(200).data(_data).build();
+        return RPCResponse.builder().code(200).data(_data).dataType(_data.getClass()).build();
     }
 
     public static RPCResponse fail() {

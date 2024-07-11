@@ -1,5 +1,6 @@
 package com.custom.common.message;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ import java.io.Serializable;
  **/
 @Data
 @Builder
+@AllArgsConstructor
 public class RPCRequest implements Serializable {
     // 服务类名
     private String interfaceName;

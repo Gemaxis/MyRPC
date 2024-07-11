@@ -1,13 +1,11 @@
 package com.custom.server;
 
-import com.custom.server.thread.ThreadPoolRPCRPCServer;
 import com.custom.server.thread.WorkThread;
 import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Map;
 
 /**
  * @author Gemaxis
@@ -15,7 +13,7 @@ import java.util.Map;
  **/
 
 @AllArgsConstructor
-public class SimpleRPCServer implements RpcServer {
+public class SimpleRPCServer implements RPCServer {
     private ServiceProvider serviceProvider;
     // 存着服务接口名-> service对象的map
 //    private Map<String, Object> serviceProvider;

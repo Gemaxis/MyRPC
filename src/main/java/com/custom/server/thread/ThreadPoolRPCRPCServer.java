@@ -1,13 +1,11 @@
 package com.custom.server.thread;
 
-import com.custom.server.RpcServer;
+import com.custom.server.RPCServer;
 import com.custom.server.ServiceProvider;
-import org.omg.SendingContext.RunTime;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -17,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author Gemaxis
  * @date 2024/07/10 15:43
  **/
-public class ThreadPoolRPCRPCServer implements RpcServer {
+public class ThreadPoolRPCRPCServer implements RPCServer {
     private final ThreadPoolExecutor threadPoolExecutor;
     //    private Map<String, Object> serviceProvide;
     private ServiceProvider serviceProvider;

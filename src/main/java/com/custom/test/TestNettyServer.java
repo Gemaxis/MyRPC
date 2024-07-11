@@ -5,6 +5,7 @@ import com.custom.common.service.Impl.BlogServiceImpl;
 import com.custom.common.service.Impl.UserServiceImpl;
 import com.custom.common.service.UserService;
 import com.custom.server.NettyRPCServer;
+import com.custom.server.RPCServer;
 import com.custom.server.ServiceProvider;
 import com.custom.server.thread.ThreadPoolRPCRPCServer;
 
@@ -28,7 +29,7 @@ public class TestNettyServer {
         // 线程池版的服务端的实现
 //        ThreadPoolRPCRPCServer threadPoolRPCRPCServer = new ThreadPoolRPCRPCServer(serviceProvider);
 //        threadPoolRPCRPCServer.start(9999);
-        NettyRPCServer nettyRPCServer = new NettyRPCServer(serviceProvider);
+        RPCServer nettyRPCServer = new NettyRPCServer(serviceProvider);
         nettyRPCServer.start(9999);
     }
 }

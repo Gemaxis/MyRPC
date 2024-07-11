@@ -1,6 +1,7 @@
 package com.custom.test;
 
 import com.custom.client.NettyRPCClient;
+import com.custom.client.RPCClient;
 import com.custom.client.RPCClientProxy;
 import com.custom.client.SimpleRPCClient;
 import com.custom.common.pojo.Blog;
@@ -15,7 +16,7 @@ import com.custom.common.service.UserService;
 public class TestNettyClient {
     public static void main(String[] args) {
         // 构建一个使用java Socket/ netty/....传输的客户端
-        NettyRPCClient nettyRPCClient = new NettyRPCClient("127.0.0.1", 9999);
+        RPCClient nettyRPCClient = new NettyRPCClient("127.0.0.1", 9999);
         // 把这个客户端传入代理客户端
         RPCClientProxy rpcClientProxy = new RPCClientProxy(nettyRPCClient);
         // 代理客户端根据不同的服务，获得一个代理类， 并且这个代理类的方法以或者增强（封装数据，发送请求）

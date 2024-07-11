@@ -1,6 +1,5 @@
 package com.custom.server;
 
-import com.custom.server.RpcServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -13,7 +12,7 @@ import lombok.AllArgsConstructor;
  **/
 
 @AllArgsConstructor
-public class NettyRPCServer implements RpcServer {
+public class NettyRPCServer implements RPCServer {
     private ServiceProvider serviceProvider;
     @Override
     public void start(int port) {
