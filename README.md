@@ -47,3 +47,11 @@
 ## 存在的问题
 
 java自带序列化方式不够通用，不够高效
+
+# V4 && V5
+
+## 总结
+
+1. 增加了 ObjectSerializer 与 JsonSerializer 两种序列化器
+2. 引入 zookeeper 作为注册中心管理 ip 和 port
+3. 新增随机和轮询两种负载均衡策略

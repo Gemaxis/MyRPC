@@ -2,6 +2,8 @@ package com.custom.client;
 
 import com.custom.common.message.RPCRequest;
 import com.custom.common.message.RPCResponse;
+import com.custom.register.ServiceRegister;
+import com.custom.register.ZkServiceRegister;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -10,24 +12,32 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 
+import java.net.InetSocketAddress;
+
 /**
  * @author Gemaxis
  * @date 2024/07/10 19:13
  **/
-public class NettyRPCClient implements RPCClient{
+public class NettyRPCClient implements RPCClient {
 
     private static final Bootstrap bootstrap;
     private static final EventLoopGroup eventLoopGroup;
     private String host;
     private int port;
-    public NettyRPCClient(String host,int port){
-        this.host=host;
-        this.port=port;
+    private ServiceRegister serviceRegister;
+
+    public NettyRPCClient(String host, int port) {
+        this.host = host;
+        this.port = port;
     }
 
-    static{
-        bootstrap=new Bootstrap();
-        eventLoopGroup=new NioEventLoopGroup();
+    public NettyRPCClient() {
+        this.serviceRegister = new ZkServiceRegister();
+    }
+
+    static {
+        bootstrap = new Bootstrap();
+        eventLoopGroup = new NioEventLoopGroup();
         bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class)
                 // NettyClientInitializer这里 配置netty对消息的处理机制
                 .handler(new NettyClientInitializer());
@@ -38,9 +48,13 @@ public class NettyRPCClient implements RPCClient{
      */
     @Override
     public RPCResponse sendRequest(RPCRequest request) {
+        // 从注册中心获取host，port
+        InetSocketAddress address = serviceRegister.serverDiscovery(request.getInterfaceName());
+        host = address.getHostName();
+        port = address.getPort();
         try {
             // 创建一个channelFuture对象，代表这一个操作事件，sync方法表示堵塞直到connect完成
-            ChannelFuture channelFuture  = bootstrap.connect(host, port).sync();
+            ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
             Channel channel = channelFuture.channel();
             // 发送数据
             channel.writeAndFlush(request);
