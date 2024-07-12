@@ -1,5 +1,7 @@
 package com.custom.register;
 
+import com.custom.loadbalance.LoadBalance;
+import com.custom.loadbalance.RandomLoadBalance;
 import com.custom.loadbalance.RoundLoadBalance;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -15,8 +17,10 @@ import java.util.List;
  * @date 2024/07/11 21:50
  **/
 public class ZkServiceRegister implements ServiceRegister {
-
-    private RoundLoadBalance roundLoadBalance = new RoundLoadBalance();
+//        private static final LoadBalance loadBalance = new RoundLoadBalance();
+    // 单例实现轮询负载均衡
+    private static final LoadBalance loadBalance = RoundLoadBalance.getInstance();
+    //    private static final LoadBalance loadBalance = new RandomLoadBalance();
     // curator 提供的zookeeper客户端
     private CuratorFramework client;
     // zk根路径节点
@@ -45,9 +49,11 @@ public class ZkServiceRegister implements ServiceRegister {
                         .creatingParentsIfNeeded()
                         .withMode(CreateMode.PERSISTENT)
                         .forPath("/" + serviceName);
-                // 路径地址，一个/代表一个节点
-                String path = "/" + serviceName + "/" + getServiceAddress(serverAddress);
-                // 临时节点
+            }
+            // 路径地址，一个/代表一个节点
+            String path = "/" + serviceName + "/" + getServiceAddress(serverAddress);
+            // 临时节点
+            if (client.checkExists().forPath(path) == null) {
                 client.create().creatingParentsIfNeeded()
                         .withMode(CreateMode.EPHEMERAL)
                         .forPath(path);
@@ -69,10 +75,11 @@ public class ZkServiceRegister implements ServiceRegister {
     public InetSocketAddress serverDiscovery(String serviceName) {
         try {
             List<String> strings = client.getChildren().forPath("/" + serviceName);
+            System.out.println(strings);
             // 默认使用第一个
 //            String string = strings.get(0);
             // 使用负载均衡
-            String string = roundLoadBalance.balance(strings);
+            String string = loadBalance.balance(strings);
             return parseAddress(string);
         } catch (Exception e) {
             throw new RuntimeException(e);

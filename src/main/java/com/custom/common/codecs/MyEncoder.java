@@ -18,13 +18,13 @@ public class MyEncoder extends MessageToByteEncoder {
     @Override
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws Exception {
         System.out.println("正在使用自定义编码器");
-        System.out.println(msg.getClass());
+//        System.out.println("正在使用的服务类：" + msg.getClass());
         // 写入消息类型
         if (msg instanceof RPCRequest) {
             out.writeShort(MessageType.REQUEST.getCode());
         } else if (msg instanceof RPCResponse) {
             out.writeShort(MessageType.RESPONSE.getCode());
-        }else {
+        } else {
             throw new IllegalArgumentException("不支持的消息类型: " + msg.getClass());
         }
 

@@ -24,7 +24,7 @@ public class JsonSerializer implements Serializer {
     @Override
     public Object deserialize(byte[] bytes, int messageType) {
         Object obj = null;
-        System.out.println("messageType:"+messageType);
+//        System.out.println("messageType:" + messageType);
         // 传输的消息分为request与response
         switch (messageType) {
             case 0:
