@@ -1,6 +1,8 @@
 # 项目概述
 
-仿照市场主流的RPC框架的设计思想，使用java语言手动实现一个高性能，高可用性的RPC框架
+仿照市场主流的RPC框架的设计思想，使用java语言手动实现一个高性能，高可用性的RPC框架。
+
+项目可以分为调用方（client）和提供方（server），client 端只需要调用接口即可，最终调用信息会通过网络传输到 server，server 通过解码后反射调用对应的方法，并将结果通过网络返回给 client。对于 client 端可以完全忽略网络的存在，就像调用本地方法一样调用 rpc 服务。
 
 # V1
 
@@ -28,6 +30,8 @@
 2. 使用了动态代理进行不同服务方法的Request的封装。
 3. 客户端更加松耦合，不再与特定的Service，host，port绑定。
 
+客户端发起一次请求调用，通过 SimpleRPCClient 的 Socket建立连接，发起请求Request，得到响应Response
+
 ## 存在的问题
 
 1. 服务端只绑定了 UserService 服务，怎样完成多个服务的注册。
@@ -42,8 +46,19 @@
 2. 功能上新增了 BlogService 服务 
 3. 服务端能够提供不同服务
 4. 对客户端进行了重构，能够支持多种版本客户端的扩展 
-5. 使用 netty 实现了客户端与服务端的通信
+5. 使用 Netty 实现了客户端与服务端的通信
 
+### 客户端和服务端重构
+
+客户端发起一次请求调用，通过 ClientProxy 动态代理封装 request 对象，并使用 IOClient 进行数据传输
+
+服务端通过 ServiceProvider 类进行本地服务的存放，使用类的方法进行服务注册（服务端注册服务）和获取本地实例（线程或者线程池得到相应服务实现类，再执行反射得到方法执行）
+
+### 使用 Netty 时
+
+客户端发起一次请求调用，通过传入不同的client(simple,netty)，即可调用公共的接口sendRequest发送请求
+
+服务端的 netty 服务线程组 boss 负责建立连接， work 负责具体的请求
 ## 存在的问题
 
 java自带序列化方式不够通用，不够高效
@@ -55,6 +70,16 @@ java自带序列化方式不够通用，不够高效
 1. 增加了 ObjectSerializer 与 JsonSerializer 两种序列化器
 2. 引入 zookeeper 作为注册中心管理 ip 和 port
 3. 新增随机和轮询两种负载均衡策略
+
+### 序列化
+
+客户端和服务端都通过 bootstrap 启动时配置相应的 NettyInitializer，调用 pipeline.addLast 配置netty对消息的处理机制，比如 JSON 等序列化
+
+### 引入 zookeeper
+
+客户端不需要指定相应的 ip 和 port, 在发送请求时，直接通过 serviceRegister 从注册中心获取host，port 发送请求
+
+服务端需要通过 ServiceProvider 类进行本地服务的存放时，还需要使用 serviceRegister 把自己的ip，端口给注册中心
 
 ## 存在的问题
 
