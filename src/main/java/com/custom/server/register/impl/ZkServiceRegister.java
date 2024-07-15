@@ -76,9 +76,8 @@ public class ZkServiceRegister implements ServiceRegister {
     }
 
 
-
     // 重载 register 服务可以选择自己是否是白名单服务
-    public void register(String serviceName, InetSocketAddress serverAddress,boolean canRetry) {
+    public void register(String serviceName, InetSocketAddress serverAddress, boolean canRetry) {
         try {
             if (client.checkExists().forPath("/" + serviceName) == null) {
                 // serviceName创建成永久节点，服务提供者下线时，不删服务名，只删地址
@@ -98,9 +97,12 @@ public class ZkServiceRegister implements ServiceRegister {
             // 如果是幂等的服务，就添加到白名单中
             if (canRetry) {
                 path = "/" + RETRY + "/" + serviceName;
-                client.create().creatingParentsIfNeeded()
-                        .withMode(CreateMode.EPHEMERAL)
-                        .forPath(path);
+                // 在白名单的服务则不再创建节点
+                if (client.checkExists().forPath(path) == null) {
+                    client.create().creatingParentsIfNeeded()
+                            .withMode(CreateMode.EPHEMERAL)
+                            .forPath(path);
+                }
             }
         } catch (Exception e) {
             System.out.println("此服务已存在");
