@@ -10,6 +10,10 @@ import java.io.Serializable;
  * @author Gemaxis
  * @date 2024/07/10 11:01
  **/
+
+/**
+ * 定义返回信息格式RpcResponse（类似http格式）
+ */
 @Data
 @Builder
 @AllArgsConstructor

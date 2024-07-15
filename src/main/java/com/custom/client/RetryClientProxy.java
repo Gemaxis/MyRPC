@@ -1,8 +1,10 @@
 package com.custom.client;
 
+import com.custom.client.retry.GuavaRetry;
+import com.custom.client.service.ServiceCenter;
+import com.custom.client.service.ZkServiceCenter;
 import com.custom.common.message.RPCRequest;
 import com.custom.common.message.RPCResponse;
-import lombok.AllArgsConstructor;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -10,34 +12,35 @@ import java.lang.reflect.Proxy;
 
 /**
  * @author Gemaxis
- * @date 2024/07/10 11:10
+ * @date 2024/07/15 15:54
  **/
+public class RetryClientProxy implements InvocationHandler {
 
-// 动态代理封装request对象
-@AllArgsConstructor
-public class ClientProxy implements InvocationHandler {
-    // 反射封装成request
-    private String host;
-    private int port;
+    private RPCClient rpcClient;
 
-    // jdk 动态代理，反射获取 request，socket 发送到服务端
-    // 当使用代理对象调用方法的时候实际会调用到这个 invoke 方法
+    private ServiceCenter serviceCenter;
+
+    public RetryClientProxy() {
+        this.serviceCenter = new ZkServiceCenter();
+        this.rpcClient = new NettyRPCClient(serviceCenter);
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        /**
-         * proxy :动态生成的代理类
-         * method : 与代理类对象调用的方法相对应
-         * args : 当前 method 方法的参数
-         */
+
         RPCRequest request = RPCRequest.builder()
                 .interfaceName(method.getDeclaringClass().getName())
                 .methodName(method.getName())
                 .params(args)
                 .paramsType(method.getParameterTypes())
                 .build();
-
-        // 使用 IOClient 进行数据传输
-        RPCResponse response = IOClient.sendRequest(host, port, request);
+        RPCResponse response;
+        // 为保持幂等性，只对白名单上的服务进行重试
+        if (serviceCenter.checkRetry(request.getInterfaceName())) {
+            response = new GuavaRetry().sendServiceWithRetry(request, rpcClient);
+        } else {
+            response = rpcClient.sendRequest(request);
+        }
         return response.getData();
     }
 

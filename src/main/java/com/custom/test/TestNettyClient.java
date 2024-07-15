@@ -19,6 +19,11 @@ public class TestNettyClient {
         RPCClient nettyRPCClient = new NettyRPCClient("127.0.0.1", 9999);
         // 把这个客户端传入代理客户端
         RPCClientProxy rpcClientProxy = new RPCClientProxy(nettyRPCClient);
+
+        // 也可以构建使用 BIO 的 SimpleRPCClient
+//        RPCClient rpcClient=new SimpleRPCClient("127.0.0.1", 9999);
+//        RPCClientProxy rpcClientProxy=new RPCClientProxy(rpcClient);
+
         // 代理客户端根据不同的服务，获得一个代理类， 并且这个代理类的方法以或者增强（封装数据，发送请求）
         UserService userService = rpcClientProxy.getProxy(UserService.class);
         // 调用查询方法

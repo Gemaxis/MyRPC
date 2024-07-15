@@ -16,14 +16,24 @@ import java.lang.reflect.Proxy;
 public class RPCClientProxy implements InvocationHandler {
     private RPCClient client;
 
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
         RPCRequest request = RPCRequest.builder()
                 .interfaceName(method.getDeclaringClass().getName())
                 .methodName(method.getName())
-                .params(args).paramsType(method.getParameterTypes())
+                .params(args)
+                .paramsType(method.getParameterTypes())
                 .build();
         RPCResponse response = client.sendRequest( request);
+//        RPCResponse response;
+//        // 为保持幂等性，只对白名单上的服务进行重试
+//        if (serviceRegister.checkRetry(request.getInterfaceName())) {
+//            response = new GuavaRetry().sendServiceWithRetry(request, client);
+//        } else {
+//            response = client.sendRequest(request);
+//        }
         return response.getData();
     }
 

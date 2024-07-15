@@ -1,4 +1,4 @@
-package com.custom.register;
+package com.custom.server.register;
 
 import java.net.InetSocketAddress;
 
@@ -11,11 +11,9 @@ public interface ServiceRegister {
      */
     void register(String serviceName, InetSocketAddress serverAddress);
 
-    /**
-     * 查询：根据服务名查找地址
-     *
-     * @param serviceName
-     * @return
-     */
-    InetSocketAddress serverDiscovery(String serviceName);
+    void register(String serviceName, InetSocketAddress serverAddress, boolean canRetry);
+
+
+
+
 }

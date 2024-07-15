@@ -1,9 +1,6 @@
-package com.custom.register;
+package com.custom.server.register.impl;
 
-import com.custom.client.cache.ServiceCache;
-import com.custom.loadbalance.LoadBalance;
-import com.custom.loadbalance.RandomLoadBalance;
-import com.custom.loadbalance.RoundLoadBalance;
+import com.custom.server.register.ServiceRegister;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -11,24 +8,18 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 
 import java.net.InetSocketAddress;
-import java.util.List;
 
 /**
  * @author Gemaxis
  * @date 2024/07/11 21:50
  **/
 public class ZkServiceRegister implements ServiceRegister {
-    //        private static final LoadBalance loadBalance = new RoundLoadBalance();
-    // 单例实现轮询负载均衡
-    private static final LoadBalance loadBalance = RoundLoadBalance.getInstance();
-    //    private static final LoadBalance loadBalance = new RandomLoadBalance();
 
-    // 本地缓存
-    private ServiceCache serviceCache;
     // curator 提供的zookeeper客户端
     private CuratorFramework client;
     // zk根路径节点
     private static final String ROOT_PATH = "MyRPC";
+    private static final String RETRY = "CanRetry";
 
     // zk 客户端初始化，并与 zk 服务端建立连接
     public ZkServiceRegister() {
@@ -43,13 +34,13 @@ public class ZkServiceRegister implements ServiceRegister {
         this.client.start();
         System.out.println("zookeeper 连接成功");
         // 初始化本地缓存
-        serviceCache = new ServiceCache();
+//        serviceCache = new ServiceCache();
         // 加入 watch
-        WatchZK watchZK = new WatchZK(client, serviceCache);
-        watchZK.watchToUpdate(ROOT_PATH);
+//        WatchZK watchZK = new WatchZK(client, serviceCache);
+//        watchZK.watchToUpdate(ROOT_PATH);
 
         // 注册关闭钩子
-        registerShutdownHook();
+//        registerShutdownHook();
     }
 
     @Override
@@ -70,6 +61,14 @@ public class ZkServiceRegister implements ServiceRegister {
                         .withMode(CreateMode.EPHEMERAL)
                         .forPath(path);
             }
+//             如果是幂等的服务，就添加到白名单中
+//            boolean canRetry = true;
+//            if (canRetry) {
+//                path = "/" + RETRY + "/" + serviceName;
+//                client.create().creatingParentsIfNeeded()
+//                        .withMode(CreateMode.EPHEMERAL)
+//                        .forPath(path);
+//            }
         } catch (Exception e) {
             System.out.println("此服务已存在");
             throw new RuntimeException(e);
@@ -77,42 +76,36 @@ public class ZkServiceRegister implements ServiceRegister {
     }
 
 
-    /**
-     * 根据服务名返回地址
-     *
-     * @param serviceName
-     * @return
-     */
-    @Override
-    public InetSocketAddress serverDiscovery(String serviceName) {
+
+    // 重载 register 服务可以选择自己是否是白名单服务
+    public void register(String serviceName, InetSocketAddress serverAddress,boolean canRetry) {
         try {
-            // 先去寻找本地缓存
-            List<String> serviceList = serviceCache.getServiceFromCache(serviceName);
-            // 如果找不到，再去 ZK 中找
-            if (serviceList == null) {
-                serviceList = client.getChildren().forPath("/" + serviceName);
+            if (client.checkExists().forPath("/" + serviceName) == null) {
+                // serviceName创建成永久节点，服务提供者下线时，不删服务名，只删地址
+                client.create()
+                        .creatingParentsIfNeeded()
+                        .withMode(CreateMode.PERSISTENT)
+                        .forPath("/" + serviceName);
             }
-            System.out.println(serviceList);
-            // 默认使用第一个
-//            String string = strings.get(0);
-            // 使用负载均衡
-            String string = loadBalance.balance(serviceList);
-            return parseAddress(string);
+            // 路径地址，一个/代表一个节点
+            String path = "/" + serviceName + "/" + getServiceAddress(serverAddress);
+            // 临时节点
+            if (client.checkExists().forPath(path) == null) {
+                client.create().creatingParentsIfNeeded()
+                        .withMode(CreateMode.EPHEMERAL)
+                        .forPath(path);
+            }
+            // 如果是幂等的服务，就添加到白名单中
+            if (canRetry) {
+                path = "/" + RETRY + "/" + serviceName;
+                client.create().creatingParentsIfNeeded()
+                        .withMode(CreateMode.EPHEMERAL)
+                        .forPath(path);
+            }
         } catch (Exception e) {
+            System.out.println("此服务已存在");
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * address字符串->地址 XXX.XXX.XXX.XXX:port
-     *
-     * @param address
-     * @return
-     */
-    private InetSocketAddress parseAddress(String address) {
-        String[] result = address.split(":");
-        return new InetSocketAddress(result[0], Integer.parseInt(result[1]));
-
     }
 
     /**

@@ -59,9 +59,12 @@
 客户端发起一次请求调用，通过传入不同的client(simple,netty)，即可调用公共的接口sendRequest发送请求
 
 服务端的 netty 服务线程组 boss 负责建立连接， work 负责具体的请求
+
 ## 存在的问题
 
-java自带序列化方式不够通用，不够高效
+只是通过 pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,0,4,0,4)); 规定了消息格式是 [长度][消息体], 用以解决粘包问题
+
+但是使用的 java 自带序列化方式不够通用，不够高效
 
 # V4 && V5
 
@@ -72,6 +75,14 @@ java自带序列化方式不够通用，不够高效
 3. 新增随机和轮询两种负载均衡策略
 
 ### 序列化
+
+自定义传输格式和编解码为
+
+[消息类型 2Byte 序列化方式 2Byte 消息长度 4Byte 序列化字节数组 byte[length]]
+
+对应
+
+[writeShort writeShort writeInt writeBytes]
 
 客户端和服务端都通过 bootstrap 启动时配置相应的 NettyInitializer，调用 pipeline.addLast 配置netty对消息的处理机制，比如 JSON 等序列化
 
@@ -91,3 +102,11 @@ java自带序列化方式不够通用，不够高效
 
 1. 在客户端建立一个本地缓存，缓存服务地址信息
 2. 通过在注册中心注册Watcher，监听注册中心的变化，实现**本地缓存的动态更新**
+
+# V7
+
+## 总结
+
+1. 将 ZooKeeper 的客户端和服务端逻辑拆分，ZkServiceRegister 类负责服务注册（服务端逻辑），ZkServiceCenter 负责服务发现（客户端逻辑）
+2. 使用 Guava Retry 实现超时重试
+3. 为了防止插入数据之类的操作重试，设置白名单，使得对幂等服务才进行超时重试，白名单存放在 ZK 中（充当配置中心的角色）

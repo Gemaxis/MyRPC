@@ -1,4 +1,4 @@
-package com.custom.register;
+package com.custom.client.service;
 
 import com.custom.client.cache.ServiceCache;
 import org.apache.curator.framework.CuratorFramework;

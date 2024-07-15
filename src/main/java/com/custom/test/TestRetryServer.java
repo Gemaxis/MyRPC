@@ -4,37 +4,34 @@ import com.custom.common.service.BlogService;
 import com.custom.common.service.Impl.BlogServiceImpl;
 import com.custom.common.service.Impl.UserServiceImpl;
 import com.custom.common.service.UserService;
+import com.custom.server.NettyRPCServer;
 import com.custom.server.RPCServer;
 import com.custom.server.ServiceProvider;
-import com.custom.server.SimpleRPCServer;
 import com.custom.server.thread.ThreadPoolRPCRPCServer;
 
 /**
  * @author Gemaxis
- * @date 2024/07/10 12:01
+ * @date 2024/07/15 12:01
  **/
-public class TestSimpleServer {
+public class TestRetryServer {
     public static void main(String[] args) {
         UserService userService = new UserServiceImpl();
         BlogService blogService = new BlogServiceImpl();
 
-        ServiceProvider serviceProvider = new ServiceProvider();
-        serviceProvider.provideServiceInterface(userService);
+//        ServiceProvider serviceProvider=new ServiceProvider();
+//        serviceProvider.provideServiceInterface(userService);
 
-//        RPCServer rpcServer=new SimpleRPCServer(serviceProvider);
+//        RpcServer rpcServer=new SimpleRPCServer(serviceProvider);
 
 //        Map<String,Object> serviceProvider=new HashMap<>();
 //        serviceProvider.put("com.custom.common.service.UserService",userService);
 //        serviceProvider.put("com.custom.common.service.BlogService",blogService);
 
-//        ServiceProvider serviceProvider = new ServiceProvider();
-//        serviceProvider.provideServiceInterface(userService);
-//        serviceProvider.provideServiceInterface(blogService);
+        ServiceProvider serviceProvider = new ServiceProvider("127.0.0.1", 9999);
+        serviceProvider.provideServiceInterface(userService,true);
+        serviceProvider.provideServiceInterface(blogService,true);
 
-        RPCServer rpcServer = new SimpleRPCServer(serviceProvider);
-        rpcServer.start(9999);
-        // 线程池版的服务端的实现
-//        ThreadPoolRPCRPCServer threadPoolRPCRPCServer = new ThreadPoolRPCRPCServer(serviceProvider);
-//        threadPoolRPCRPCServer.start(9999);
+        RPCServer nettyRPCServer = new NettyRPCServer(serviceProvider);
+        nettyRPCServer.start(9999);
     }
 }
