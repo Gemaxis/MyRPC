@@ -2,7 +2,7 @@ package com.custom.client.service;
 
 import com.custom.client.cache.ServiceCache;
 import com.custom.loadbalance.LoadBalance;
-import com.custom.loadbalance.RoundLoadBalance;
+import com.custom.loadbalance.impl.RoundLoadBalance;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

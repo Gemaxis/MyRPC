@@ -1,4 +1,6 @@
-package com.custom.loadbalance;
+package com.custom.loadbalance.impl;
+
+import com.custom.loadbalance.LoadBalance;
 
 import java.util.List;
 import java.util.Random;
@@ -7,7 +9,7 @@ import java.util.Random;
  * @author Gemaxis
  * @date 2024/07/12 09:56
  **/
-public class RandomLoadBalance implements LoadBalance{
+public class RandomLoadBalance implements LoadBalance {
     @Override
     public String balance(List<String> addressList) {
         Random random = new Random();

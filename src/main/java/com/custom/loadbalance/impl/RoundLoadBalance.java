@@ -1,4 +1,6 @@
-package com.custom.loadbalance;
+package com.custom.loadbalance.impl;
+
+import com.custom.loadbalance.LoadBalance;
 
 import java.util.List;
 
