@@ -1,8 +1,16 @@
 # 项目概述
 
-仿照市场主流的RPC框架的设计思想，使用java语言手动实现一个高性能，高可用性的RPC框架。
+仿照市场主流的RPC框架 Dubbo 的设计思想，使用java语言手动实现一个高性能，高可用性的RPC框架。
 
-项目可以分为调用方（client）和提供方（server），client 端只需要调用接口即可，最终调用信息会通过网络传输到 server，server 通过解码后反射调用对应的方法，并将结果通过网络返回给 client。对于 client 端可以完全忽略网络的存在，就像调用本地方法一样调用 rpc 服务。
+![Dubbo 流程图](images/Dubbo.png)
+
+<center>Dubbo 流程图</center>
+
+MyRPC 项目可以分为调用方（client）和提供方（server），client 端只需要调用接口即可，最终调用信息会通过网络传输到 server，server 通过解码后反射调用对应的方法，并将结果通过网络返回给 client。对于 client 端可以完全忽略网络的存在，就像调用本地方法一样调用 rpc 服务。
+
+![项目流程图](images/RPC.jpg)
+
+<center>MyRPC 项目流程图</center>
 
 # V1
 

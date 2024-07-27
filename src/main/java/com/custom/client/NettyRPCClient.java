@@ -42,6 +42,7 @@ public class NettyRPCClient implements RPCClient {
 
     static {
         bootstrap = new Bootstrap();
+        // Netty 的 Reactor 线程池 是 EventLoopGroup
         eventLoopGroup = new NioEventLoopGroup();
         bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class)
                 // NettyClientInitializer这里 配置netty对消息的处理机制
