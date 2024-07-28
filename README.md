@@ -6,7 +6,9 @@
 
 <center>Dubbo 流程图</center>
 
-MyRPC 项目可以分为调用方（client）和提供方（server），client 端只需要调用接口即可，最终调用信息会通过网络传输到 server，server 通过解码后反射调用对应的方法，并将结果通过网络返回给 client。对于 client 端可以完全忽略网络的存在，就像调用本地方法一样调用 rpc 服务。
+MyRPC 项目可以分为调用方（client）和提供方（server），client 端只需要调用接口即可，最终调用信息会通过网络传输到 server，server
+通过解码后反射调用对应的方法，并将结果通过网络返回给 client。对于 client 端可以完全忽略网络的存在，就像调用本地方法一样调用
+rpc 服务。
 
 ![项目流程图](images/RPC.jpg)
 
@@ -48,10 +50,10 @@ MyRPC 项目可以分为调用方（client）和提供方（server），client �
 
 ## 概述
 
-1. 添加线程池版的服务端的实现 
-2. 功能上新增了 BlogService 服务 
+1. 添加线程池版的服务端的实现
+2. 功能上新增了 BlogService 服务
 3. 服务端能够提供不同服务
-4. 对客户端进行了重构，能够支持多种版本客户端的扩展 
+4. 对客户端进行了重构，能够支持多种版本客户端的扩展
 5. 使用 Netty 实现了客户端与服务端的通信
 
 ### 客户端和服务端重构
@@ -68,7 +70,8 @@ MyRPC 项目可以分为调用方（client）和提供方（server），client �
 
 ## 存在的问题
 
-只是通过 pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,0,4,0,4)); 规定了消息格式是 [长度][消息体], 用以解决粘包问题
+只是通过 pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE,0,4,0,4)); 规定了消息格式是 [长度][消息体],
+用以解决粘包问题
 
 但是使用的 java 自带序列化方式不够通用，不够高效
 
@@ -90,7 +93,8 @@ MyRPC 项目可以分为调用方（client）和提供方（server），client �
 
 [writeShort writeShort writeInt writeBytes]
 
-客户端和服务端都通过 bootstrap 启动时配置相应的 NettyInitializer，调用 pipeline.addLast 配置netty对消息的处理机制，比如 JSON 等序列化
+客户端和服务端都通过 bootstrap 启动时配置相应的 NettyInitializer，调用 pipeline.addLast 配置netty对消息的处理机制，比如
+JSON 等序列化
 
 ### 引入 zookeeper
 
@@ -132,9 +136,11 @@ MyRPC 项目可以分为调用方（client）和提供方（server），client �
 
 在本地方法调用中，函数体是直接通过函数指针来指定的，但是在远程调用中，由于两个进程的地址空间完全不一样，函数指针不起作用。
 
-RPC中所有函数或方法都有自己的一个ID，在所有进程中都唯一。客户端在做远程过程调用时，必须附上这个ID，即客户端会查一下表，找出相应的Call ID，然后传给服务端，服务端也会查表，来确定客户端需要调用的函数，然后执行相应函数的代码。
+RPC中所有函数或方法都有自己的一个ID，在所有进程中都唯一。客户端在做远程过程调用时，必须附上这个ID，即客户端会查一下表，找出相应的Call
+ID，然后传给服务端，服务端也会查表，来确定客户端需要调用的函数，然后执行相应函数的代码。
 
-在项目中，首先用本地 Map<String, Object> 存储服务，为了避免本机映射表的类型安全性差、可扩展性有限、存在单点故障等问题，使用在注册中心注册服务，注册中心具有集中管理（ZK节点注册）、高可用性（服务降级和熔断保护）和容错（超时重试）、负载均衡（可自己实现多种负载均衡算法）、自动发现（ZK的Watch机制）等优点。
+在项目中，首先用本地 Map<String, Object>
+存储服务，为了避免本机映射表的类型安全性差、可扩展性有限、存在单点故障等问题，使用在注册中心注册服务，注册中心具有集中管理（ZK节点注册）、高可用性（服务降级和熔断保护）和容错（超时重试）、负载均衡（可自己实现多种负载均衡算法）、自动发现（ZK的Watch机制）等优点。
 
 为了客户端更快寻址而不用频繁访问ZK，还建立一个本地缓存，缓存服务地址信息。
 

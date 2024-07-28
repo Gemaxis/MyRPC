@@ -30,8 +30,9 @@ public class NettyClientInitializer extends ChannelInitializer<SocketChannel> {
         // addLast没有先后顺序，netty通过加入的类实现的接口来自动识别类实现的是什么功能
         // 使用自定义的编解码器
         pipeline.addLast(new MyDecoder());
-        // 编码需要传入序列化器，这里是json，还支持 ObjectSerializer
+        // 编码需要传入序列化器，这里是json，还支持 ObjectSerializer 和 fastjson2
         pipeline.addLast(new MyEncoder(new JsonSerializer()));
+//        pipeline.addLast(new MyEncoder(new FastJson2Serializer()));
         // 消息格式 [长度][消息体], 解决粘包问题
 //        pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
 //        // 计算当前待发送消息的长度，写入到前4个字节中
