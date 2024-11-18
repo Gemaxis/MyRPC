@@ -1,4 +1,4 @@
-package com.custom.myrpc;
+package com.custom;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

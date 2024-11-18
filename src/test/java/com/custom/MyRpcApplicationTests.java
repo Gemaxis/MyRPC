@@ -1,4 +1,4 @@
-package com.custom.myrpc;
+package com.custom;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.custom.myrpc.common.utils;
+package com.custom.common.utils;
 
 import java.lang.Thread.State;
 

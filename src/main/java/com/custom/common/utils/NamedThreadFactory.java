@@ -29,6 +29,7 @@ public class NamedThreadFactory implements ThreadFactory {
     public NamedThreadFactory(String prefix, boolean daemon) {
         mPrefix = prefix + "-thread-";
         mDaemon = daemon;
+        // 如果有 SecurityManager，则优先使用 SecurityManager 提供的线程组，可能是基于安全策略的特定线程组。
         SecurityManager s = System.getSecurityManager();
         mGroup = (s == null) ? Thread.currentThread().getThreadGroup() : s.getThreadGroup();
     }

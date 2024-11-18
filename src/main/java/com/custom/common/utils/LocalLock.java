@@ -22,6 +22,10 @@ public class LocalLock {
                 .build();
     }
 
+    public Cache<String, Lock> getLockCache() {
+        return lockCache;
+    }
+
     public void executeWithLock(String key, long timeout, TimeUnit unit, Runnable task) throws InterruptedException {
         // computeIfAbsent 来避免重复创建 Lock 实例，从而简化了双重检查锁的写法。
         Lock lock = lockCache.asMap().computeIfAbsent(key, k -> new ReentrantLock());
@@ -35,14 +39,20 @@ public class LocalLock {
 //                }
 //            }
 //        }
+//        System.out.println(Thread.currentThread().getName() + " 尝试获取锁: " + key);
+
         boolean locked = lock.tryLock(timeout, unit);
         if (!locked) {
+//            System.out.println(Thread.currentThread().getName() + " 获取锁失败: " + key);
             return;
         }
+//        System.out.println(Thread.currentThread().getName() + " 成功获取锁: " + key);
+
         try {
             task.run();
         } finally {
             lock.unlock();
+//            System.out.println(Thread.currentThread().getName() + " 释放锁: " + key);
         }
     }
 }
