@@ -32,12 +32,7 @@ public class ConsistencyHashBalance implements LoadBalance {
         for (String server : serviceList) {
             realNodes.add(server);
             System.out.println("真实节点[" + server + "] 被添加");
-            for (int i = 0; i < VIRTUAL_NUM; i++) {
-                String virtualNode = server + "&&VN" + i;
-                int hash = getHash(virtualNode);
-                shards.put(hash, virtualNode);
-                System.out.println("虚拟节点[" + virtualNode + "] hash:" + hash + "，被添加");
-            }
+            addVirtualNodes(server);
         }
     }
 
@@ -74,12 +69,7 @@ public class ConsistencyHashBalance implements LoadBalance {
         if (!realNodes.contains(node)) {
             realNodes.add(node);
             System.out.println("真实节点[" + node + "] 上线添加");
-            for (int i = 0; i < VIRTUAL_NUM; i++) {
-                String virtualNode = node + "&&VN" + i;
-                int hash = getHash(virtualNode);
-                shards.put(hash, virtualNode);
-                System.out.println("虚拟节点[" + virtualNode + "] hash:" + hash + "，被添加");
-            }
+            addVirtualNodes(node);
         }
     }
 
@@ -149,6 +139,19 @@ public class ConsistencyHashBalance implements LoadBalance {
 
     }
 
+    /**
+     * 为指定节点添加虚拟节点到哈希环
+     *
+     * @param node 真实节点名称
+     */
+    private static void addVirtualNodes(String node) {
+        for (int i = 0; i < VIRTUAL_NUM; i++) {
+            String virtualNode = node + "&&VN" + i;
+            int hash = getHash(virtualNode);
+            shards.put(hash, virtualNode);
+            System.out.println("虚拟节点[" + virtualNode + "] hash:" + hash + "，被添加");
+        }
+    }
+
 
 }
-

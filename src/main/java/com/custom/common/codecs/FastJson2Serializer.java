@@ -36,7 +36,15 @@ public class FastJson2Serializer implements Serializer {
                 for (int i = 0; i < objects.length; i++) {
                     Class<?> paramsType = request.getParamsType()[i];
                     if (!paramsType.isAssignableFrom(request.getParams()[i].getClass())) {
-                        objects[i] = JSON.parseObject(JSON.toJSONString(request.getParams()[i]), request.getParamsType()[i]);
+                        // objects[i] = JSON.parseObject(JSON.toJSONString(request.getParams()[i]),
+                        //         request.getParamsType()[i]);
+                        // 直接进行对象转换，避免字符串中间步骤
+                        if (request.getParams()[i] instanceof JSONObject) {
+                            objects[i] = ((JSONObject) request.getParams()[i]).toJavaObject(paramsType);
+                        } else {
+                            // 只在必要时进行转换
+                            objects[i] = JSON.parseObject(JSON.toJSONBytes(request.getParams()[i]), paramsType);
+                        }
                     } else {
                         objects[i] = request.getParams()[i];
                     }
@@ -48,7 +56,14 @@ public class FastJson2Serializer implements Serializer {
                 RPCResponse response = JSON.parseObject(bytes, RPCResponse.class);
                 Class<?> dataType = response.getDataType();
                 if (!dataType.isAssignableFrom(response.getData().getClass())) {
-                    response.setData(JSON.parseObject(JSON.toJSONString(response.getData()), dataType));
+                    // response.setData(JSON.parseObject(JSON.toJSONString(response.getData()), dataType));
+                    // 直接进行对象转换，避免字符串中间步骤
+                    if (response.getData() instanceof JSONObject) {
+                        response.setData(((JSONObject) response.getData()).toJavaObject(dataType));
+                    } else {
+                        // 只在必要时进行转换
+                        response.setData(JSON.parseObject(JSON.toJSONBytes(response.getData()), dataType));
+                    }
                 }
                 obj = response;
                 break;
