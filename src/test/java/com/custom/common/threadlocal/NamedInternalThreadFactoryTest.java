@@ -9,10 +9,11 @@ import org.junit.jupiter.api.Test;
  **/
 public class NamedInternalThreadFactoryTest {
     @Test
-    void newThread(){
-        NamedInternalThreadFactory namedInternalThreadFactory=new NamedInternalThreadFactory("MyRPC");
-        Thread t=namedInternalThreadFactory.newThread(()->{});
-        Assertions.assertEquals(t.getClass(),InternalThread.class,"thread is not InternalThread");
-        Assertions.assertEquals(t.getName(),"MyRPC-thread-1");
+    void newThread() {
+        NamedInternalThreadFactory namedInternalThreadFactory = new NamedInternalThreadFactory("MyRPC");
+        Thread t = namedInternalThreadFactory.newThread(() -> {
+        });
+        Assertions.assertEquals(InternalThread.class, t.getClass(), "thread is not InternalThread");
+        Assertions.assertEquals("MyRPC-thread-1", t.getName());
     }
 }
