@@ -669,4 +669,25 @@ public interface CommonConstants {
     String ZOOKEEPER_ENSEMBLE_TRACKER_KEY = "zookeeper.ensemble.tracker";
 
     String DUBBO_VERSIONS_KEY = "META-INF/dubbo-versions";
+
+    // ================== MyRPC 自定义常量 ==================
+    // 重试相关
+    int RETRY_WAIT_SECONDS = 2;
+    int RETRY_MAX_ATTEMPTS = 3;
+    
+    // 熔断相关
+    int CIRCUIT_BREAKER_DEFAULT_FAIL_COUNT = 3;
+    double CIRCUIT_BREAKER_DEFAULT_FAIL_RATIO = 0.5;
+    int CIRCUIT_BREAKER_DEFAULT_RECOVER_TIME_MS = 10000;
+
+    // 通用字符串
+    String SUCCESS_MSG = "success";
+    String FAIL_MSG = "fail";
+    String METHOD_EXECUTE_ERROR_MSG = "方法执行错误";
+    String NOT_SUPPORT_MSG = "不支持此种消息";
+    String NEW_CIRCUIT_BREAKER_SUCCESS_MSG = "新建熔断器成功";
+
+    // 端口、主机
+    String DEFAULT_HOST = "127.0.0.1";
+    int DEFAULT_PORT = 6666;
 }
