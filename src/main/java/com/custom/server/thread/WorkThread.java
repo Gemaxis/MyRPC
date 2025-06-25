@@ -4,6 +4,7 @@ import com.custom.common.message.RPCRequest;
 import com.custom.common.message.RPCResponse;
 import com.custom.server.ServiceProvider;
 import lombok.AllArgsConstructor;
+import static com.custom.common.utils.CommonConstants.METHOD_EXECUTE_ERROR_MSG;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -53,7 +54,7 @@ public class WorkThread implements Runnable {
             return RPCResponse.success(invoke);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             e.printStackTrace();
-            System.out.println("方法执行错误");
+            System.out.println(METHOD_EXECUTE_ERROR_MSG);
             return RPCResponse.fail();
         }
     }

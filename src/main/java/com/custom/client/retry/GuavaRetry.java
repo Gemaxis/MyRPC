@@ -4,6 +4,8 @@ import com.custom.client.RPCClient;
 import com.custom.common.message.RPCRequest;
 import com.custom.common.message.RPCResponse;
 import com.github.rholder.retry.*;
+import static com.custom.common.utils.CommonConstants.RETRY_WAIT_SECONDS;
+import static com.custom.common.utils.CommonConstants.RETRY_MAX_ATTEMPTS;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -30,9 +32,9 @@ public class GuavaRetry {
                 //返回结果为 error时进行重试
                 .retryIfResult(response -> Objects.equals(response.getCode(), 500))
                 //重试等待策略：等待 2s 后再进行重试
-                .withWaitStrategy(WaitStrategies.fixedWait(2, TimeUnit.SECONDS))
+                .withWaitStrategy(WaitStrategies.fixedWait(RETRY_WAIT_SECONDS, TimeUnit.SECONDS))
                 //重试停止策略：重试达到 3 次
-                .withStopStrategy(StopStrategies.stopAfterAttempt(3))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(RETRY_MAX_ATTEMPTS))
                 .withRetryListener(new RetryListener() {
                     @Override
                     public <V> void onRetry(Attempt<V> attempt) {

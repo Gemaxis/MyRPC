@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.custom.common.message.RPCRequest;
 import com.custom.common.message.RPCResponse;
+import static com.custom.common.utils.CommonConstants.NOT_SUPPORT_MSG;
 
 /**
  * 由于json序列化的方式是通过把对象转化成字符串，丢失了Data对象的类信息，所以deserialize需要
@@ -60,7 +61,7 @@ public class JsonSerializer implements Serializer {
                 obj = response;
                 break;
             default:
-                System.out.println("不支持此种消息");
+                System.out.println(NOT_SUPPORT_MSG);
                 throw new RuntimeException();
         }
         return obj;
