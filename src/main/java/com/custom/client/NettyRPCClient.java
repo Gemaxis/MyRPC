@@ -15,62 +15,62 @@ import io.netty.util.AttributeKey;
 import java.net.InetSocketAddress;
 
 /**
- * @author Gemaxis
- * @date 2024/07/10 19:13
- **/
+ * 基于Netty的RPC客户端实现。
+ */
 public class NettyRPCClient implements RPCClient {
 
-    private static final Bootstrap bootstrap;
-    private static final EventLoopGroup eventLoopGroup;
+    private static final Bootstrap BOOTSTRAP;
+    private static final EventLoopGroup EVENT_LOOP_GROUP;
     private String host;
     private int port;
     private ServiceCenter serviceCenter;
 
+    static {
+        BOOTSTRAP = new Bootstrap();
+        EVENT_LOOP_GROUP = new NioEventLoopGroup();
+        BOOTSTRAP.group(EVENT_LOOP_GROUP).channel(NioSocketChannel.class)
+                .handler(new NettyClientInitializer());
+    }
+
+    /**
+     * 构造方法，指定host和port
+     */
     public NettyRPCClient(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
+    /**
+     * 默认构造，使用ZkServiceCenter
+     */
     public NettyRPCClient() {
-//        this.serviceRegister = new ZkServiceRegister();
         this.serviceCenter = new ZkServiceCenter();
     }
 
+    /**
+     * 构造方法，指定ServiceCenter
+     */
     public NettyRPCClient(ServiceCenter serviceCenter) {
         this.serviceCenter = serviceCenter;
     }
 
-    static {
-        bootstrap = new Bootstrap();
-        // Netty 的 Reactor 线程池 是 EventLoopGroup
-        eventLoopGroup = new NioEventLoopGroup();
-        bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class)
-                // NettyClientInitializer这里 配置netty对消息的处理机制
-                .handler(new NettyClientInitializer());
-    }
-
     /**
-     * 这里需要操作一下，因为netty的传输都是异步的，你发送request，会立刻返回， 而不是想要的相应的response
+     * 发送RPC请求
+     * @param request 请求对象
+     * @return 响应对象
      */
     @Override
     public RPCResponse sendRequest(RPCRequest request) {
-        // 从注册中心获取host，port
         InetSocketAddress address = serviceCenter.serverDiscovery(request.getInterfaceName());
         host = address.getHostName();
         port = address.getPort();
         try {
-            // 创建一个channelFuture对象，代表这一个操作事件，sync方法表示堵塞直到connect完成
-            ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
+            ChannelFuture channelFuture = BOOTSTRAP.connect(host, port).sync();
             Channel channel = channelFuture.channel();
-            // 发送数据
             channel.writeAndFlush(request);
             channel.closeFuture().sync();
-            // 阻塞的获得结果，通过给channel设计别名，获取特定名字下的channel中的内容（这个在hanlder中设置）
-            // AttributeKey是，线程隔离的，不会由线程安全问题。
-            // 实际上不应通过阻塞，可通过回调函数
             AttributeKey<RPCResponse> key = AttributeKey.valueOf(RPCResponse.ATTR_KEY);
             RPCResponse response = channel.attr(key).get();
-
             System.out.println(response);
             return response;
         } catch (InterruptedException e) {

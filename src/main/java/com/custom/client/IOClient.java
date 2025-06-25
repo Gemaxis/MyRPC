@@ -9,26 +9,24 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
- * @author Gemaxis
- * @date 2024/07/10 11:15
- **/
-
-// 客户端根据不同的Service进行动态代理
+ * 基于Socket的简单RPC客户端。
+ */
 public class IOClient {
-    // 这里负责底层与服务端的通信，发送的Request，接受的是Response对象
-    // 客户端发起一次请求调用，Socket建立连接，发起请求Request，得到响应Response
-    // 这里的request是封装好的（上层进行封装），不同的service需要进行不同的封装， 客户端只知道Service接口，需要一层动态代理根据反射封装不同的Service
-    public static RPCResponse sendRequest(String host, int port, RPCRequest request) {
-        try {
-            Socket socket = new Socket(host, port);
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 
+    /**
+     * 发送RPC请求，返回响应
+     * @param host 服务端主机
+     * @param port 服务端端口
+     * @param request 请求对象
+     * @return 响应对象
+     */
+    public static RPCResponse sendRequest(String host, int port, RPCRequest request) {
+        try (Socket socket = new Socket(host, port);
+             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream())) {
             oos.writeObject(request);
             oos.flush();
-
-            RPCResponse response = (RPCResponse) ois.readObject();
-            return response;
+            return (RPCResponse) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;
