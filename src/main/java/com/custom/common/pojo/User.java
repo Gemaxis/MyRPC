@@ -1,23 +1,21 @@
 package com.custom.common.pojo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 
 /**
- * @author Gemaxis
- * @date 2024/07/10 11:44
- **/
-@Builder
+ * 用户实体类。
+ */
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable {
-    // 客户端和服务端共有的
+    /** 用户ID */
     private Integer id;
-    private String userName;
-    private Integer sex;
+    /** 用户名 */
+    private String name;
+    /** 用户密码 */
+    private String password;
 }

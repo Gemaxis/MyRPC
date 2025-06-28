@@ -5,6 +5,8 @@ import com.custom.common.logger.LoggerFactory;
 import org.apache.log4j.Level;
 
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * @author Gemaxis
@@ -12,6 +14,8 @@ import java.util.List;
  **/
 public class LogUtil {
     private static final Logger Log = LoggerFactory.getLogger(LogUtil.class);
+
+    private LogUtil() {}
 
     public static void start() {
         MyRPCAppender.doStart();
@@ -63,5 +67,14 @@ public class LogUtil {
             }
         }
         return count;
+    }
+
+    /**
+     * 获取当前时间字符串，格式为yyyy-MM-dd HH:mm:ss
+     * @return 当前时间字符串
+     */
+    public static String getCurrentTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(new Date());
     }
 }

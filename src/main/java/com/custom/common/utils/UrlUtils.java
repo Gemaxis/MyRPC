@@ -1,16 +1,21 @@
 package com.custom.common.utils;
 
-import com.custom.common.URL;
-
 /**
- * @author Gemaxis
- * @date 2024/11/03 22:12
- **/
+ * URL工具类。
+ */
 public class UrlUtils {
-    private UrlUtils() {
-        throw new UnsupportedOperationException("No instance of 'UrlUtils' for you! ");
-    }
-    private static final String URL_PARAM_STARTING_SYMBOL = "?";
 
-//    public static URL
+    /**
+     * 拼接两个URL字符串
+     * @param base 基础URL
+     * @param path 路径
+     * @return 拼接后的URL
+     */
+    public static String join(String base, String path) {
+        if (base.endsWith("/")) {
+            return base + path;
+        } else {
+            return base + "/" + path;
+        }
+    }
 }

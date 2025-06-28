@@ -24,11 +24,16 @@ public class RPCResponse implements Serializable {
     // 用其它序列化方式（除了java Serialize）得不到data的type
     private Class<?> dataType;
 
+    public static final int CODE_SUCCESS = 200;
+    public static final int CODE_FAIL = 500;
+    public static final String MSG_FAIL = "Server error!!!";
+    public static final String ATTR_KEY = "RPCResponse";
+
     public static RPCResponse success(Object _data) {
-        return RPCResponse.builder().code(200).data(_data).dataType(_data.getClass()).build();
+        return RPCResponse.builder().code(CODE_SUCCESS).data(_data).dataType(_data.getClass()).build();
     }
 
     public static RPCResponse fail() {
-        return RPCResponse.builder().code(500).message("Server error!!!").build();
+        return RPCResponse.builder().code(CODE_FAIL).message(MSG_FAIL).build();
     }
 }

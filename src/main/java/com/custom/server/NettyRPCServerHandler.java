@@ -8,6 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.AllArgsConstructor;
+import static com.custom.common.utils.CommonConstants.METHOD_EXECUTE_ERROR_MSG;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -53,7 +54,7 @@ public class NettyRPCServerHandler extends SimpleChannelInboundHandler<RPCReques
             return RPCResponse.success(invoke);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-            System.out.println("方法执行错误");
+            System.out.println(METHOD_EXECUTE_ERROR_MSG);
             return RPCResponse.fail();
         }
     }

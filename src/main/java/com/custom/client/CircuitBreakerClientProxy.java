@@ -15,9 +15,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * @author Gemaxis
- * @date 2024/07/15 15:54
- **/
+ * 支持熔断的RPC客户端动态代理。
+ */
 public class CircuitBreakerClientProxy implements InvocationHandler {
 
     private RPCClient rpcClient;
@@ -27,13 +26,24 @@ public class CircuitBreakerClientProxy implements InvocationHandler {
     private CircuitBreakerProvider circuitBreakerProvider;
     private FallbackStrategy<String> fallbackStrategy;
 
+    /**
+     * 默认构造，使用ZkServiceCenter和NettyRPCClient。
+     */
     public CircuitBreakerClientProxy() {
         this.serviceCenter = new ZkServiceCenter();
         this.rpcClient = new NettyRPCClient(serviceCenter);
         this.circuitBreakerProvider = new CircuitBreakerProvider();
-        this.fallbackStrategy = new DefaultFallbackStrategy(); // 初始化默认的降级策略
+        this.fallbackStrategy = new DefaultFallbackStrategy();
     }
 
+    /**
+     * 动态代理方法调用
+     * @param proxy 代理对象
+     * @param method 被调用方法
+     * @param args 方法参数
+     * @return 方法返回值
+     * @throws Throwable 异常
+     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
@@ -69,8 +79,14 @@ public class CircuitBreakerClientProxy implements InvocationHandler {
         return response.getData();
     }
 
+    /**
+     * 获取代理对象
+     * @param tClass 接口类
+     * @param <T> 泛型
+     * @return 代理对象
+     */
     public <T> T getProxy(Class<T> tClass) {
         Object object = Proxy.newProxyInstance(tClass.getClassLoader(), new Class[]{tClass}, this);
-        return (T) object;
+        return tClass.cast(object);
     }
 }
